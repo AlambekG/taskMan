@@ -1,4 +1,5 @@
 Telegram Task Manager Bot
+
 This Telegram bot is designed to help users manage their tasks and appointments. It provides features for scheduling, reminders, and tracking task completions.
 
 Features
@@ -10,7 +11,8 @@ Task Completion Tracking: Users can mark tasks as completed, helping them keep t
 
 Importance/Deadline Sorting: The bot can sort tasks based on their importance or deadline.
 
-Getting Started
+Getting Started:
+
 Prerequisites
 Node.js
 MongoDB
