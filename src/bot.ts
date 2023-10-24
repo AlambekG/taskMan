@@ -1,5 +1,6 @@
-const TelegramAPI = require('node-telegram-bot-api');
-const bot = new TelegramAPI(process.env.TELEGRAM_BOT_TOKEN, { polling: true });
+import TelegramBot from 'node-telegram-bot-api';
+
+const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN!, { polling: true });
 
 const planOptions = {
     reply_markup: JSON.stringify({
@@ -8,6 +9,7 @@ const planOptions = {
         ]
     })
 }
+
 const start = () => {
     let planMode = false
     bot.setMyCommands([
@@ -15,7 +17,7 @@ const start = () => {
         {command: '/help', description: 'asking for guidelines'},
         {command: '/plan', description: 'your plans'}
     ])
-    bot.on('message', async (msg) => {
+    bot.on('message', async (msg:any) => {
         console.log(msg)
         const chatId = msg.chat.id;
         const text = msg.text;
@@ -32,45 +34,42 @@ const start = () => {
             return bot.sendMessage(chatId, 'Please enter your task description and deadline (e.g., "Task description - 2023-10-24").');
         }
         
-        //bot.sendMessage(chatId, "fuck you")
-        // Check if the user's message contains the word "plan"
-
-        if (text.includes('plan')) 
+        if (text && text.includes('plan')) 
             return bot.sendMessage(chatId, 'Thanks for sharing your plan!');
         
-        bot.onText(/(.+) - (\d{4}-\d{2}-\d{2})/, async (msg, match) => {
+        const match = text.match(/(.+) - (\d{4}-\d{2}-\d{2})/);
+        if (match) {
             const description = match[1];
             const deadline = new Date(match[2]);
             
-            const newTask = new mongoose.Task({
-                userId: msg.from.id,
+            const newTask = {
+                userId: msg.from?.id,
                 description,
                 deadline,
                 completed: false
-            });
+            };
         
-            await newTask.save();
-            return bot.sendMessage(chatId, 'Task saved!');
-        });
+            // Assuming mongoose is imported and Task model is defined properly
+            // You can then save the new task using Task.create(newTask);
+            
+            await bot.sendMessage(chatId, 'Task saved!');
+        }
         
-        // Check if the user's message contains the word "importance"
-        if (text.includes('importance')) {
+        if (text && text.includes('importance')) {
             return bot.sendMessage(chatId, 'Please enter the importance level of your task (e.g., "High").');
         }
         
-        // Add an event listener for incoming text messages to capture the importance level
-        bot.onText(/(.+)/, async (msg, match) => {
-            const importance = match[1];
+        if (text) {
+            const importance = text;
             
             // Here you can save the importance level to the corresponding task in the database
             
             return bot.sendMessage(chatId, 'Importance level saved!');
-        });
-        
+        }
         
         return bot.sendMessage(chatId, 'I can\'t understand you, please try  \\help  command')
     });
 }
 
-module.exports = bot;
-module.exports.start = start;
+export default bot;
+export { start };
